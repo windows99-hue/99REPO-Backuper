@@ -1,0 +1,5 @@
+clc99==2.1
+easygui==0.98.3
+keyboard==0.13.5
+pycryptodome==3.22.0
+watchdog==6.0.0
