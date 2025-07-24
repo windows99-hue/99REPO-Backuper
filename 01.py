@@ -94,6 +94,7 @@ def WatchSave(filepath):
             self.debounce_timer = None
             
         def on_modified(self, event):
+            global NowLevel
             if not event.is_directory and os.path.abspath(event.src_path) == os.path.abspath(filepath):
                 # 使用延迟处理来防止多次触发
                 if self.debounce_timer is not None:
