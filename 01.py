@@ -180,8 +180,9 @@ def enter_restore_mode():
                 backup_name = os.path.basename(backup_name)
                 # 恢复选中的存档
                 if not os.path.exists(os.path.dirname(SavePath)):
+                    print_status("新建文件夹")
                     os.makedirs(os.path.dirname(SavePath))
-                shutil.copy(backup_path, os.path.dirname(SavePath)+backup_name)
+                shutil.copy(backup_path, os.path.dirname(SavePath) + "\\" + backup_name)
                 print_good(f"已成功恢复第 {backups[choice-1][1]} 关存档")
                 return
             else:
