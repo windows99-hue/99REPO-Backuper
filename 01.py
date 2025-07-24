@@ -84,7 +84,7 @@ def BackupSave(level):
     print_good("第{}关备份成功！".format(level))
 
 def WatchSave(filepath):
-    global observer, NowLevel
+    global observer, NowLevel, running
     
     if not os.path.isfile(filepath):
         raise FileNotFoundError(f"文件 '{filepath}' 不存在")
@@ -125,7 +125,16 @@ def WatchSave(filepath):
         observer.join(timeout=2)
         sys.exit(0)
     
+    def restore_program():
+        global running
+        print_warning("检测到按下 O 键，进入恢复模式...")
+        #running = False
+        observer.stop()
+        observer.join(timeout=2)
+        enter_restore_mode()
+    
     keyboard.add_hotkey('p', exit_program)
+    keyboard.add_hotkey('o', restore_program)
     
     while running:
         time.sleep(1)
@@ -134,6 +143,51 @@ def CheckDirVaild(path):
     return os.path.isdir(path)
 
 #####回档#####
+def enter_restore_mode():
+    print_status("已进入回档模式")
+    print_status("可用的备份存档:")
+    
+    backup_dir = os.path.join(SaverSavePath, SavePathDir)
+    if not os.path.exists(backup_dir):
+        print_error("没有找到备份目录")
+        return
+    
+    backups = []
+    for file in os.listdir(backup_dir):
+        if file.startswith(SavePathName) and "level" in file:
+            level = file.split("level")[-1]
+            backups.append((file, level))
+    
+    if not backups:
+        print_error("没有找到任何备份存档")
+        return
+    
+    for i, (file, level) in enumerate(backups, 1):
+        print_good(f"{i}. 第 {level} 关备份")
+    
+    while True:
+        try:
+            choice = input("请输入要恢复的备份编号 (输入q退出): ")
+            if choice.lower() == 'q':
+                print_status("退出恢复模式")
+                return
+            
+            choice = int(choice)
+            if 1 <= choice <= len(backups):
+                selected_file = backups[choice-1][0]
+                backup_path = os.path.join(backup_dir, selected_file)
+                backup_name = os.path.splitext(os.path.join(backup_dir, selected_file))[0]
+                backup_name = os.path.basename(backup_name)
+                # 恢复选中的存档
+                if not os.path.exists(os.path.dirname(SavePath)):
+                    os.makedirs(os.path.dirname(SavePath))
+                shutil.copy(backup_path, os.path.dirname(SavePath)+backup_name)
+                print_good(f"已成功恢复第 {backups[choice-1][1]} 关存档")
+                return
+            else:
+                print_error("无效的选择，请重新输入")
+        except ValueError:
+            print_error("请输入有效的数字")
 
 # 主程序
 if __name__ != "__main__":
