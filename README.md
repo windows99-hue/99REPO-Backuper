@@ -12,7 +12,7 @@
 pip install -r requirements.txt
 ~~~
 
-`config.txt中为文档的备份目录，您可以根据程序提示操作
+`config.txt`中为文档的备份目录，您可以根据程序提示操作
 
 ## 使用
 
